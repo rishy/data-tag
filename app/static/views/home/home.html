@@ -1,10 +1,11 @@
 <div class="jumbotron">
   <div class="input-group">
-    <textarea class="form-control custom-control" rows="10" style="resize:none"></textarea> <span class="input-group-addon btn btn-primary">Tag It!</span>
+    <textarea class="form-control custom-control" rows="5" style="resize:none" ng-model="input.text"></textarea>
+    	<span class="input-group-addon btn btn-primary" ng-click="postData(input.text)">Tag It!</span>
   </div>
 </div>
 
-<div id="tag-wrapper">
+<div id="tag-wrapper">  
   <h4>This text is related to:</h4>
   <div>
     <ul>
