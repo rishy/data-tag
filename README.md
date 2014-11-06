@@ -5,7 +5,6 @@ Data-Tag is an evolved system to classify textual data and web pages using NLP t
 
 
 ## Setup
-<br>
 
 After Forking the Repo into your account...
 
@@ -48,11 +47,10 @@ flask/bin/python run.py
 ```
 Your service will run at [http://localhost:5000](http://localhost:5000).
 
-<br>
 The Grunt server will run at [http://localhost:9000](http://localhost:9000). It will proxy REST requests to the Flask service running at [http://localhost:5000](http://localhost:5000).
 
 ## Contribution Guidelines
-<br>
+
 After Cloning the Repo...
 
 Set the `upstream` to this repo:
