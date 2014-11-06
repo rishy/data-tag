@@ -1,5 +1,85 @@
+/* Space out content a bit */
 body {
-  margin-top: 60px;
-  padding: 10px;
-  background-color: #ECF0F1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header {
+  padding-left: 15px;
+  padding-right: 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 19px;
+  color: #DBDBDB;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+.jumbotron span{
+	color: #464646;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header{
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: 30px;
+  }
+    /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+body{
+  background-color: #34495e; 
+}
+
+#tag-wrapper{  
+  color: #DBDBDB;
+  text-align: center;
+}
+
+#tag-wrapper ul{
+  list-style-type: none;
+  margin: auto;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#tag-wrapper ul li{
+  padding: 5px 10px;
+  background-color: #2C3D4E;
+  border-radius: 4px;  
+  margin-left: 1%;
+  margin-right: 1%;
 }
