@@ -1,6 +1,7 @@
 <div class="jumbotron">
   <div class="input-group">
-    <textarea class="form-control custom-control" rows="10" style="resize:none"></textarea> <span class="input-group-addon btn btn-primary">Tag It!</span>
+    <textarea class="form-control custom-control" rows="5" style="resize:none" ng-model="input.text"></textarea>
+    	<span class="input-group-addon btn btn-primary" ng-click="postData(input.text)">Tag It!</span>
   </div>
 </div>
 
@@ -12,5 +13,9 @@
       <li>Computers</li>
       <li>Mobile Devices</li>
     </ul>
+    <ul>
+      <li>Text is about |-  {{resultData.text}}</li>
+    </ul>
+
   </div>
 </div>
