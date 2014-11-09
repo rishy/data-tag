@@ -1,6 +1,7 @@
 import nltk
 import numpy
 import json
+import re
 from app import app
 from flask import request
 from flask import session
@@ -38,11 +39,39 @@ def apiTagit():
         abort(400)
     # Json data extraction
     text = request.json['text']
+
+    # Tokenize input text using NLTK
     data = nltk.pos_tag(nltk.tokenize.word_tokenize(text))
+    print data
+
+    # Json Object to store nouns
     nouns = {}
+
+    # Regex holder for noun terms
+    a = re.compile("NN.*")
+
     for word in data:
-        if word[1] == 'NN':
+        if a.match(word[1]):
             nouns[word[0]] = word[0];
+
+    # leave this intact, will be used for further robustness
+    '''data_len = len(data)
+    i = 0
+
+    while i < data_len:
+        temp_list = []
+        if nouns.__contains__(data[i]):
+            temp_list.append(data[i]);
+            while ++i < data_len:
+                if nouns.__contains__(data[i]):
+                    temp_list.append(data[i]);
+
+        for word in temp_list:
+            nouns.pop(word)
+
+        str = " ".join(temp_list)
+        nouns[str] = str'''
+
     json_data = json.dumps(nouns)
     print json_data
     return make_response(json_data,200)

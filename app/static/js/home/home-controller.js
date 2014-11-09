@@ -2,6 +2,7 @@ angular.module('data-tag')
   .controller('HomeController', ['$scope','$http', function ($scope, $http) {
 
     $scope.resultData = [];
+    $scope.showResult = false;
   	$scope.postData = function(text){
         // API target
         var url = 'http://localhost:5000/api/tagit/v1.0/';
@@ -16,6 +17,7 @@ angular.module('data-tag')
               nouns.push(noun);
             }
             // Returned data from API end
+            $scope.showResult = true;
             $scope.resultData = nouns;
         }).error(function(data, status){
             console.log("Failure");

@@ -74,12 +74,13 @@ body{
   margin: 0;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 #tag-wrapper ul li{
   padding: 5px 10px;
   background-color: #2C3D4E;
   border-radius: 4px;  
-  margin-left: 1%;
-  margin-right: 1%;
+  margin: 1%;
+
 }
