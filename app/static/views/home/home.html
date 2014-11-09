@@ -6,15 +6,15 @@
 </div>
 
 <div id="tag-wrapper">
-  <h4>This text is related to:</h4>
+  <h4>Nouns found in this Text are:</h4>
   <div>
-    <ul>
+    <!--<ul>
       <li>Apple Inc.</li>
       <li>Computers</li>
       <li>Mobile Devices</li>
-    </ul>
+    </ul>-->
     <ul>
-      <li>Text is about |-  {{resultData.text}}</li>
+      <li ng-repeat="noun in resultData">{{noun}}</li>
     </ul>
 
   </div>

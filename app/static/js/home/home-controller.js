@@ -1,7 +1,7 @@
 angular.module('data-tag')
   .controller('HomeController', ['$scope','$http', function ($scope, $http) {
 
-    $scope.resultData = {};
+    $scope.resultData = [];
   	$scope.postData = function(text){
         // API target
         var url = 'http://localhost:5000/api/tagit/v1.0/';
@@ -10,9 +10,13 @@ angular.module('data-tag')
         textData.text = text;
         $http.post(url, textData).success(function(data, status){
             console.log("Text Sent!");
-            console.log(data.text);
+            console.log(data);
+            var nouns = [];
+            for (var noun in data){
+              nouns.push(noun);
+            }
             // Returned data from API end
-            $scope.resultData = data;
+            $scope.resultData = nouns;
         }).error(function(data, status){
             console.log("Failure");
         })

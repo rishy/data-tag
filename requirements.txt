@@ -5,3 +5,4 @@ argparse
 grequests
 beautifulsoup4
 nltk
+numpy

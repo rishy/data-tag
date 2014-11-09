@@ -1,4 +1,6 @@
-import ntlk
+import nltk
+import numpy
+import json
 from app import app
 from flask import request
 from flask import session
@@ -11,6 +13,10 @@ from flask import flash
 from flask import make_response
 from flask import jsonify
 from flask.ext.cors import cross_origin
+
+# can be removed once installed
+nltk.download('punkt')
+nltk.download('maxent_treebank_pos_tagger')
 
 @app.route('/')
 def root():
@@ -31,9 +37,15 @@ def apiTagit():
     if not request.json or not is_contain(request.json,'text'):
         abort(400)
     # Json data extraction
-    data = request.json
-    print data
-    return make_response(jsonify(data),200)
+    text = request.json['text']
+    data = nltk.pos_tag(nltk.tokenize.word_tokenize(text))
+    nouns = {}
+    for word in data:
+        if word[1] == 'NN':
+            nouns[word[0]] = word[0];
+    json_data = json.dumps(nouns)
+    print json_data
+    return make_response(json_data,200)
 
 
 # app error handler
