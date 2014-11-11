@@ -6,3 +6,4 @@ grequests
 beautifulsoup4
 nltk
 numpy
+wikipedia

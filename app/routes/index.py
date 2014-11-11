@@ -2,6 +2,7 @@ import nltk
 import numpy
 import json
 import re
+import wikipedia
 from app import app
 from flask import request
 from flask import session
@@ -16,8 +17,8 @@ from flask import jsonify
 from flask.ext.cors import cross_origin
 
 # can be removed once installed
-nltk.download('punkt')
-nltk.download('maxent_treebank_pos_tagger')
+#nltk.download('punkt')
+#nltk.download('maxent_treebank_pos_tagger')
 
 @app.route('/')
 def root():
@@ -28,6 +29,30 @@ def is_contain(payload,*args):
         if not a in payload:
             return False
     return True
+
+# Uses WikiPedia API to fetch pages based on input nouns 
+def get_wiki_data(nouns, in_text):
+    # A list to store final tags output
+    tags = []
+    for noun in nouns_list:
+        pages = []
+        pages = wikipedia.search(noun)
+        for page in pages:
+            wiki_content = wikipedia.page(page).content
+            tags.append(run_wsd(wiki_content, in_text))
+    return tags
+
+# Runs Word-Sense Disambiguation Algorithm to fetch the approporiate tag
+def run_wsd(content, text):
+    # A JSON object to store tag data
+    tag_data = {}
+
+    '''
+        Code for Word-Sense Disambiguation Algorithm to filter out the 
+        possible-tag data.
+    '''
+
+    return tag_data
 
 @app.route('/api/tagit/v1.0/', methods= ['OPTIONS','POST'])
 @cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
@@ -47,30 +72,24 @@ def apiTagit():
     # Json Object to store nouns
     nouns = {}
 
+    # List to store nouns
+    nouns_list = []
+
     # Regex holder for noun terms
     a = re.compile("NN.*")
 
+    # Create the response JSON Object for found nouns
     for word in data:
         if a.match(word[1]):
             nouns[word[0]] = word[0];
+            nouns_list.append(word[0]);
 
-    # leave this intact, will be used for further robustness
-    '''data_len = len(data)
-    i = 0
+    '''
+    # Use Wikipedia API to get content based on found nouns and then run WSD
+    tags = get_wiki_data(nouns_list, text)
 
-    while i < data_len:
-        temp_list = []
-        if nouns.__contains__(data[i]):
-            temp_list.append(data[i]);
-            while ++i < data_len:
-                if nouns.__contains__(data[i]):
-                    temp_list.append(data[i]);
-
-        for word in temp_list:
-            nouns.pop(word)
-
-        str = " ".join(temp_list)
-        nouns[str] = str'''
+        jsonify this "tags" list as the final output
+    '''
 
     json_data = json.dumps(nouns)
     print json_data
