@@ -14,7 +14,7 @@ angular.module('data-tag')
             console.log(data);
             var nouns = [];
             for (var noun in data){
-              nouns.push(noun);
+              nouns.push(data[noun]);
             }
             // Returned data from API end
             $scope.showResult = true;

@@ -110,3 +110,8 @@ Always squash up your commits into a single commit before sending the Pull Reque
 ```
 git rebase -i HEAD~3
 ```
+
+For any changes in `requirements.txt`, you will have to run
+```
+flask/bin/pip install -r requirements.txt
+```

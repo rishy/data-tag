@@ -3,6 +3,8 @@ import numpy
 import json
 import re
 import wikipedia
+import operator
+from nltk.corpus import stopwords
 from app import app
 from flask import request
 from flask import session
@@ -15,10 +17,13 @@ from flask import flash
 from flask import make_response
 from flask import jsonify
 from flask.ext.cors import cross_origin
+from operator import itemgetter
+from pattern.en import singularize
 
 # can be removed once installed
 #nltk.download('punkt')
 #nltk.download('maxent_treebank_pos_tagger')
+nltk.download('stopwords')
 
 @app.route('/')
 def root():
@@ -33,13 +38,15 @@ def is_contain(payload,*args):
 # Uses WikiPedia API to fetch pages based on input nouns 
 def get_wiki_data(nouns, in_text):
     # A list to store final tags output
+    print("Fetching Data from Wikipedia...")
     tags = []
-    for noun in nouns_list:
+    for noun in nouns:
         pages = []
-        pages = wikipedia.search(noun)
+        pages = wikipedia.search(noun[0])
         for page in pages:
-            wiki_content = wikipedia.page(page).content
-            tags.append(run_wsd(wiki_content, in_text))
+            wiki_content = wikipedia.page(page).summary
+            tags.append(wiki_content)
+            #tags.append(run_wsd(wiki_content, in_text))
     return tags
 
 # Runs Word-Sense Disambiguation Algorithm to fetch the approporiate tag
@@ -62,37 +69,66 @@ def apiTagit():
 
     if not request.json or not is_contain(request.json,'text'):
         abort(400)
+    
+    # Futile stopwords
+    sw = stopwords.words('english')
+    
+    # Json Objects to store nouns
+    nouns = {}
+
+    # List to store nouns counts
+    nouns_counts = {}
+    
+    # Regex holder for noun terms
+    a = re.compile("NN.*")
+
     # Json data extraction
     text = request.json['text']
 
     # Tokenize input text using NLTK
-    data = nltk.pos_tag(nltk.tokenize.word_tokenize(text))
-    print data
+    data = set(nltk.pos_tag(nltk.tokenize.word_tokenize(text.lower())))
+    #print (data)   
 
-    # Json Object to store nouns
-    nouns = {}
-
-    # List to store nouns
-    nouns_list = []
-
-    # Regex holder for noun terms
-    a = re.compile("NN.*")
-
-    # Create the response JSON Object for found nouns
     for word in data:
-        if a.match(word[1]):
-            nouns[word[0]] = word[0];
-            nouns_list.append(word[0]);
 
-    '''
+        w = realW = word[0]
+
+        # Singularizing proper, singular, nouns(NNP) may result in errors
+        if word[1] != "NNP":
+            w = singularize(w)
+
+        if a.match(word[1]) and realW not in nouns.keys() and w not in sw:
+
+            nouns[w] = w.capitalize()
+
+            # Tokenize all the words in input text
+            token = nltk.tokenize.word_tokenize(text.lower())
+
+            # Count no. of occurences of current singular word in text
+            nouns_counts[w] = token.count(w)
+
+            # If word has been singularized, also count its original plural form
+            if w != realW:                
+                nouns_counts[w] += token.count(realW)
+
+    # Gets the sorted nouns_counts according to the no. of occurrences
+    nouns_counts = sorted(nouns_counts.items(), key=operator.itemgetter(1), reverse = True)
+
+    # Nouns to be passed to wikipedia API
+    top_nouns = nouns_counts[:]
+    print top_nouns
+    # print nouns
+   
     # Use Wikipedia API to get content based on found nouns and then run WSD
-    tags = get_wiki_data(nouns_list, text)
-
-        jsonify this "tags" list as the final output
-    '''
+    '''tags = get_wiki_data(top_nouns, text)
+    print tags[0]
+    print("-----------------------------------------------")
+    print tags[1]'''
+    '''jsonify this "tags" list as the final output'''
+   
 
     json_data = json.dumps(nouns)
-    print json_data
+    # print json_data
     return make_response(json_data,200)
 
 
