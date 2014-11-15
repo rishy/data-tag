@@ -65,8 +65,10 @@ def noun_precisor(single_nouns, text):
     # List of content, input text splitted into single word excluding (.)
     puncset = set(string.punctuation)
     puncset.remove('.')
+    puncset.remove(',')
+    puncset.remove(';')
     res = "".join(c for c in text if c not in puncset)
-    listofcontent =  re.findall(r"[\w']+|[.]",res)
+    listofcontent =  re.findall(r"[\w']+|[.,;]",res)
 
 
     temp_nouns = []
@@ -111,16 +113,25 @@ def noun_precisor(single_nouns, text):
 def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
 
     tlist = []
+    temp_jnd_nouns = joined_nouns
+
+    print joined_nouns, raw_nouns_single
 
     # Joined nouns contains multiple single nouns, Single nouns elimination
     for kres,vres in joined_nouns.iteritems():
+        mx_occur = 0
         tlist = kres.split()
         for x in tlist:
             if(x in raw_nouns_single.keys()):
+                mx_occur = max(mx_occur, raw_nouns_single[x])
                 raw_nouns_single.pop(x, None)
             else:
                 pass
+        if mx_occur > 1:
+            temp_jnd_nouns[kres] += mx_occur
     #print raw_nouns_single
+    joined_nouns = temp_jnd_nouns
+    #print joined_nouns
 
     tmp_joined_nouns = []
     repeat_joined_nouns = []
@@ -144,7 +155,7 @@ def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
                         break
                 if(flag):
                     repeat_joined_nouns.append(backup_nouns[j])
-                    joined_nouns[tmp_joined_nouns[i]] += joined_nouns[backup_nouns[j]]
+                    #joined_nouns[tmp_joined_nouns[i]] += joined_nouns[backup_nouns[j]]
             else:
                 for x in text1:
                     if(x not in text2):
@@ -152,7 +163,7 @@ def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
                         break
                 if(flag):
                     repeat_joined_nouns.append(tmp_joined_nouns[i])
-                    joined_nouns[backup_nouns[j]] += joined_nouns[tmp_joined_nouns[i]]
+                    #joined_nouns[backup_nouns[j]] += joined_nouns[tmp_joined_nouns[i]]
 
     #print repeat_joined_nouns
 
