@@ -2,6 +2,7 @@ import nltk
 import numpy
 import json
 import re
+import string
 import wikipedia
 import operator
 from nltk.corpus import stopwords
@@ -35,7 +36,7 @@ def is_contain(payload,*args):
             return False
     return True
 
-# Uses WikiPedia API to fetch pages based on input nouns 
+# Uses WikiPedia API to fetch pages based on input nouns
 def get_wiki_data(nouns, in_text):
     # A list to store final tags output
     print("Fetching Data from Wikipedia...")
@@ -49,13 +50,135 @@ def get_wiki_data(nouns, in_text):
             #tags.append(run_wsd(wiki_content, in_text))
     return tags
 
+
+# Join nouns which occurs together and delete repeated nouns
+def noun_precisor(single_nouns, text):
+
+    # Incoming list Data to dictionary
+    raw_nouns_single = {}
+    for x in single_nouns:
+        t_str = x[0].capitalize()
+        raw_nouns_single[t_str] = x[1]
+
+    #print raw_nouns_single
+
+    # List of content, input text splitted into single word excluding (.)
+    puncset = set(string.punctuation)
+    puncset.remove('.')
+    res = "".join(c for c in text if c not in puncset)
+    listofcontent =  re.findall(r"[\w']+|[.]",res)
+
+
+    temp_nouns = []
+    result = {}
+
+    for key,val in raw_nouns_single.iteritems():
+        temp_nouns.append(key)
+
+    # To check noun counts and Joined noun text
+    cnt_noun = 0
+    join_noun = ""
+    for i,x in enumerate(listofcontent):
+        #print i,"-",x
+        x = x.capitalize()
+        if(x in temp_nouns):
+            cnt_noun += 1
+            if(join_noun == ""):
+                join_noun += x
+            else:
+                join_noun += " " + x
+            #print cnt,tmp
+        else:
+            if(cnt_noun > 1):
+                if(join_noun in result.keys()):
+                    result[join_noun] += 1;
+                else:
+                    result[join_noun] = 1
+
+            join_noun = ""
+            cnt_noun = 0
+    '''
+    print "---Raw Joined_Nouns(Contain multiple joined nouns)------"
+    print result
+    '''
+
+    # Result contains raw joined nouns, Passed Joined and single nouns for filter
+    Nouns_wiki = multiple_noun_eliminator(result, raw_nouns_single)
+
+    return Nouns_wiki
+
+
+def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
+
+    tlist = []
+
+    # Joined nouns contains multiple single nouns, Single nouns elimination
+    for kres,vres in joined_nouns.iteritems():
+        tlist = kres.split()
+        for x in tlist:
+            if(x in raw_nouns_single.keys()):
+                raw_nouns_single.pop(x, None)
+            else:
+                pass
+    #print raw_nouns_single
+
+    tmp_joined_nouns = []
+    repeat_joined_nouns = []
+
+    # Copy of Joined Nouns data to make list for easy operation
+    for x,v in joined_nouns.iteritems():
+        tmp_joined_nouns.append(x)
+
+    backup_nouns = tmp_joined_nouns
+
+    #All nouns matched entity removed from Joined nouns list and Occurences are merged.
+    for i in range(0,len(tmp_joined_nouns)):
+        text1 = tmp_joined_nouns[i].split()
+        for j in range(i+1,len(backup_nouns)):
+            flag = 1
+            text2 = backup_nouns[j].split()
+            if(len(text1) >= len(text2)):
+                for x in text2:
+                    if(x not in text1):
+                        flag = 0
+                        break
+                if(flag):
+                    repeat_joined_nouns.append(backup_nouns[j])
+                    joined_nouns[tmp_joined_nouns[i]] += joined_nouns[backup_nouns[j]]
+            else:
+                for x in text1:
+                    if(x not in text2):
+                        flag = 0
+                        break
+                if(flag):
+                    repeat_joined_nouns.append(tmp_joined_nouns[i])
+                    joined_nouns[backup_nouns[j]] += joined_nouns[tmp_joined_nouns[i]]
+
+    #print repeat_joined_nouns
+
+    for x in repeat_joined_nouns:
+        joined_nouns.pop(x, None)
+    '''
+    print "--------------Final Joined Nouns--------------------"
+    print joined_nouns
+    print "--------------Final Single Nouns--------------------"
+    print raw_nouns_single
+    print "--------------End of nouns Processing--------------------"
+    '''
+    Nouns_to_wiki = dict(joined_nouns.items() + raw_nouns_single.items())
+
+    #print Nouns_to_wiki
+
+    return Nouns_to_wiki
+
+
 # Runs Word-Sense Disambiguation Algorithm to fetch the approporiate tag
 def run_wsd(content, text):
     # A JSON object to store tag data
     tag_data = {}
 
     '''
-        Code for Word-Sense Disambiguation Algorithm to filter out the 
+        Code for Word-Sense Disambiguation Algorithm to filter out the
         possible-tag data.
     '''
 
@@ -69,16 +192,16 @@ def apiTagit():
 
     if not request.json or not is_contain(request.json,'text'):
         abort(400)
-    
+
     # Futile stopwords
     sw = stopwords.words('english')
-    
+
     # Json Objects to store nouns
     nouns = {}
 
     # List to store nouns counts
     nouns_counts = {}
-    
+
     # Regex holder for noun terms
     a = re.compile("NN.*")
 
@@ -87,17 +210,17 @@ def apiTagit():
 
     # Tokenize input text using NLTK
     data = set(nltk.pos_tag(nltk.tokenize.word_tokenize(text.lower())))
-    #print (data)   
 
     for word in data:
 
         w = realW = word[0]
 
         # Singularizing proper, singular, nouns(NNP) may result in errors
-        if word[1] != "NNP":
+        '''if word[1] != "NNP":
             w = singularize(w)
-
+        '''
         if a.match(word[1]) and realW not in nouns.keys() and w not in sw:
+
 
             nouns[w] = w.capitalize()
 
@@ -108,7 +231,7 @@ def apiTagit():
             nouns_counts[w] = token.count(w)
 
             # If word has been singularized, also count its original plural form
-            if w != realW:                
+            if w != realW:
                 nouns_counts[w] += token.count(realW)
 
     # Gets the sorted nouns_counts according to the no. of occurrences
@@ -116,19 +239,31 @@ def apiTagit():
 
     # Nouns to be passed to wikipedia API
     top_nouns = nouns_counts[:]
-    print top_nouns
+    #print top_nouns
     # print nouns
-   
+
+    # Get precise nouns (join nouns which occur together)
+    Nouns_wiki = noun_precisor(top_nouns, text)
+
+    print "--------------Final Joined Nouns--------------------"
+
+    print Nouns_wiki, type(Nouns_wiki)
+    '''
+    for k,v in Nouns_wiki.iteritems():
+        print k,'->',v
+    '''
+
     # Use Wikipedia API to get content based on found nouns and then run WSD
     '''tags = get_wiki_data(top_nouns, text)
     print tags[0]
     print("-----------------------------------------------")
     print tags[1]'''
     '''jsonify this "tags" list as the final output'''
-   
 
-    json_data = json.dumps(nouns)
-    # print json_data
+    json_data = json.dumps(Nouns_wiki)
+
+    #json_data = json.dumps(nouns)
+    #print json_data
     return make_response(json_data,200)
 
 
