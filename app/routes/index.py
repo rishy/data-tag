@@ -24,7 +24,7 @@ from pattern.en import singularize
 # can be removed once installed
 #nltk.download('punkt')
 #nltk.download('maxent_treebank_pos_tagger')
-nltk.download('stopwords')
+#nltk.download('stopwords')
 
 @app.route('/')
 def root():
@@ -229,14 +229,13 @@ def apiTagit():
 
     for word in data:
 
-        w = realW = word[0]
+        w = word[0]
 
         # Singularizing proper, singular, nouns(NNP) may result in errors
         '''if word[1] != "NNP":
             w = singularize(w)
         '''
-        if a.match(word[1]) and realW not in nouns.keys() and w not in sw:
-
+        if a.match(word[1]) and w not in nouns.keys() and w not in sw:
 
             nouns[w] = w.capitalize()
 
@@ -247,8 +246,8 @@ def apiTagit():
             nouns_counts[w] = token.count(w)
 
             # If word has been singularized, also count its original plural form
-            if w != realW:
-                nouns_counts[w] += token.count(realW)
+            if w != w:
+                nouns_counts[w] += token.count(w)
 
     # Gets the sorted nouns_counts according to the no. of occurrences
     nouns_counts = sorted(nouns_counts.items(), key=operator.itemgetter(1), reverse = True)
@@ -261,9 +260,23 @@ def apiTagit():
     # Get precise nouns (join nouns which occur together)
     Nouns_wiki = noun_precisor(top_nouns, text)
 
+    # Adds up the count of singular and plural nouns
+    for k,v in Nouns_wiki.items():
+
+        token = nltk.pos_tag(nltk.tokenize.word_tokenize(k))
+        print token
+        if token[0][1] != "NNP":
+
+            singular = singularize(k);
+
+            if k != singular and Nouns_wiki.has_key(singular):
+
+                Nouns_wiki[k] = Nouns_wiki[k] + Nouns_wiki[singular];
+                del Nouns_wiki[singular];
+   
     print "--------------Final Joined Nouns--------------------"
 
-    print Nouns_wiki, type(Nouns_wiki)
+    #print Nouns_wiki, type(Nouns_wiki)
     '''
     for k,v in Nouns_wiki.iteritems():
         print k,'->',v
@@ -277,9 +290,7 @@ def apiTagit():
     '''jsonify this "tags" list as the final output'''
 
     json_data = json.dumps(Nouns_wiki)
-
-    #json_data = json.dumps(nouns)
-    #print json_data
+    print sorted(Nouns_wiki.items(), key=operator.itemgetter(1), reverse = True)
     return make_response(json_data,200)
 
 

@@ -12,10 +12,8 @@ angular.module('data-tag')
         $http.post(url, textData).success(function(data, status){
             console.log("Text Sent!");
             console.log(data);
-            var nouns = [];
-            for (var noun in data){
-              nouns.push(data[noun]);
-            }
+            var nouns = Object.keys(data);
+            console.log(nouns);
             // Returned data from API end
             $scope.showResult = true;
             $scope.resultData = nouns;
