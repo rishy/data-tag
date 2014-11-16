@@ -56,20 +56,24 @@ def noun_precisor(single_nouns, text):
 
     # Incoming list Data to dictionary
     raw_nouns_single = {}
+
+    puncset = set(string.punctuation)
+
     for x in single_nouns:
         t_str = x[0].capitalize()
-        raw_nouns_single[t_str] = x[1]
-
-    print raw_nouns_single
+        s = ''.join(ch for ch in t_str if ch not in puncset)
+        raw_nouns_single[s] = x[1]
+    #print raw_nouns_single
+    #print text
 
     # List of content, input text splitted into single word excluding (.)
-    puncset = set(string.punctuation)
     puncset.remove('.')
     puncset.remove(',')
     puncset.remove(';')
     res = "".join(c for c in text if c not in puncset)
     listofcontent =  re.findall(r"[\w']+|[.,;]",res)
 
+    #print listofcontent
 
     temp_nouns = []
     result = {}
