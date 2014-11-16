@@ -60,7 +60,7 @@ def noun_precisor(single_nouns, text):
         t_str = x[0].capitalize()
         raw_nouns_single[t_str] = x[1]
 
-    #print raw_nouns_single
+    print raw_nouns_single
 
     # List of content, input text splitted into single word excluding (.)
     puncset = set(string.punctuation)
@@ -91,33 +91,39 @@ def noun_precisor(single_nouns, text):
                 join_noun += " " + x
             #print cnt,tmp
         else:
-            if(cnt_noun > 1):
-                if(join_noun in result.keys()):
-                    result[join_noun] += 1;
-                else:
-                    result[join_noun] = 1
+            if(join_noun in result.keys()):
+                result[join_noun] += 1;
+            else:
+                result[join_noun] = 1
 
             join_noun = ""
             cnt_noun = 0
-    '''
+
+    blank_key = ""
+    if(blank_key in result.keys()):
+        del result[blank_key]
+
     print "---Raw Joined_Nouns(Contain multiple joined nouns)------"
-    print result
-    '''
+    #print result
+    for x,v in result.iteritems():
+        print x, " - ", v
+
 
     # Result contains raw joined nouns, Passed Joined and single nouns for filter
-    Nouns_wiki = multiple_noun_eliminator(result, raw_nouns_single)
+    Nouns_wiki = multiple_noun_eliminator(result)
 
     return Nouns_wiki
 
 
-def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
+def multiple_noun_eliminator(joined_nouns):
 
     tlist = []
-    temp_jnd_nouns = joined_nouns
+    #temp_jnd_nouns = joined_nouns
 
-    print joined_nouns, raw_nouns_single
+    #print joined_nouns
 
     # Joined nouns contains multiple single nouns, Single nouns elimination
+    '''
     for kres,vres in joined_nouns.iteritems():
         mx_occur = 0
         tlist = kres.split()
@@ -132,7 +138,7 @@ def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
     #print raw_nouns_single
     joined_nouns = temp_jnd_nouns
     #print joined_nouns
-
+    '''
     tmp_joined_nouns = []
     repeat_joined_nouns = []
 
@@ -155,7 +161,7 @@ def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
                         break
                 if(flag):
                     repeat_joined_nouns.append(backup_nouns[j])
-                    #joined_nouns[tmp_joined_nouns[i]] += joined_nouns[backup_nouns[j]]
+                    joined_nouns[tmp_joined_nouns[i]] += joined_nouns[backup_nouns[j]]
             else:
                 for x in text1:
                     if(x not in text2):
@@ -163,24 +169,19 @@ def multiple_noun_eliminator(joined_nouns, raw_nouns_single):
                         break
                 if(flag):
                     repeat_joined_nouns.append(tmp_joined_nouns[i])
-                    #joined_nouns[backup_nouns[j]] += joined_nouns[tmp_joined_nouns[i]]
+                    joined_nouns[backup_nouns[j]] += joined_nouns[tmp_joined_nouns[i]]
 
-    #print repeat_joined_nouns
-
+    #Delete repeat_joined_nouns
     for x in repeat_joined_nouns:
         joined_nouns.pop(x, None)
     '''
     print "--------------Final Joined Nouns--------------------"
     print joined_nouns
-    print "--------------Final Single Nouns--------------------"
-    print raw_nouns_single
+    for x,v in joined_nouns.iteritems():
+        print x, " - ", v
     print "--------------End of nouns Processing--------------------"
     '''
-    Nouns_to_wiki = dict(joined_nouns.items() + raw_nouns_single.items())
-
-    #print Nouns_to_wiki
-
-    return Nouns_to_wiki
+    return joined_nouns
 
 
 # Runs Word-Sense Disambiguation Algorithm to fetch the approporiate tag
