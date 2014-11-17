@@ -126,23 +126,6 @@ def multiple_noun_eliminator(joined_nouns):
 
     #print joined_nouns
 
-    # Joined nouns contains multiple single nouns, Single nouns elimination
-    '''
-    for kres,vres in joined_nouns.iteritems():
-        mx_occur = 0
-        tlist = kres.split()
-        for x in tlist:
-            if(x in raw_nouns_single.keys()):
-                mx_occur = max(mx_occur, raw_nouns_single[x])
-                raw_nouns_single.pop(x, None)
-            else:
-                pass
-        if mx_occur > 1:
-            temp_jnd_nouns[kres] += mx_occur
-    #print raw_nouns_single
-    joined_nouns = temp_jnd_nouns
-    #print joined_nouns
-    '''
     tmp_joined_nouns = []
     repeat_joined_nouns = []
 
@@ -227,6 +210,8 @@ def apiTagit():
     # Tokenize input text using NLTK
     data = set(nltk.pos_tag(nltk.tokenize.word_tokenize(text.lower())))
 
+    #print data
+
     for word in data:
 
         w = word[0]
@@ -273,7 +258,7 @@ def apiTagit():
 
                 Nouns_wiki[k] = Nouns_wiki[k] + Nouns_wiki[singular];
                 del Nouns_wiki[singular];
-   
+
     print "--------------Final Joined Nouns--------------------"
 
     #print Nouns_wiki, type(Nouns_wiki)
