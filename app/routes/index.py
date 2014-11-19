@@ -17,7 +17,7 @@ from flask import render_template
 from flask import flash
 from flask import make_response
 from flask import jsonify
-from flask.ext.cors import cross_origin
+from flask.ext.cors import CORS, cross_origin
 from operator import itemgetter
 from pattern.en import singularize
 
@@ -25,10 +25,6 @@ from pattern.en import singularize
 #nltk.download('punkt')
 #nltk.download('maxent_treebank_pos_tagger')
 #nltk.download('stopwords')
-
-@app.route('/')
-def root():
-    return app.send_static_file('index.html')
 
 def is_contain(payload,*args):
     for a in args:
@@ -183,9 +179,20 @@ def run_wsd(content, text):
 
     return tag_data
 
+# Routing for homepage/root page
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
+
+
+# Routing for tagit api
 @app.route('/api/tagit/v1.0/', methods= ['OPTIONS','POST'])
 @cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
 def apiTagit():
+    print 'I got an api request'
+    print 'Method Type: %s' % request.method
+    print 'Content : %s' % request.json
+    print request.headers
     if request.method == 'OPTIONS':
         return make_response(jsonify({"Allow":"POST"}),200)
 
