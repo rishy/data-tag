@@ -5,10 +5,11 @@ angular.module('data-tag')
     $scope.showResult = false;
   	$scope.postData = function(text){
         // API target
-        var url = 'http://localhost:5000/api/tagit/v1.0/';
+        var url = 'http://127.0.0.1:5000/api/tagit/v1.0/';
         // Object for data
         textData = {};
         textData.text = text;
+        console.log(textData);
         $http.post(url, textData).success(function(data, status){
             console.log("Text Sent!");
             console.log(data);
@@ -18,6 +19,7 @@ angular.module('data-tag')
             $scope.showResult = true;
             $scope.resultData = nouns;
         }).error(function(data, status){
+            console.log(data);
             console.log("Failure");
         })
 
