@@ -6,16 +6,10 @@
 </div>
 
 <div ng-show="showResult" id="tag-wrapper">
-  <h4>Nouns found in this Text are:</h4>
-  <div>
-    <!--<ul>
-      <li>Apple Inc.</li>
-      <li>Computers</li>
-      <li>Mobile Devices</li>
-    </ul>-->
-    <ul>
-      <li ng-repeat="noun in resultData">{{noun}}</li>
-    </ul>
-
+  <h4>This paragraph is about </h4> <h2><bold>{{ page.title}}</bold></h2>
+  <div class="jumbotron">
+      <h2>Summary</h2>
+      <p>{{ page.summary }}</p>
+      <a href="{{ page.url }}" target="_blank">Read More</a>
   </div>
 </div>

@@ -10,44 +10,39 @@ After Forking the Repo into your account...
 
 Use `git clone` to clone this repo to your local machine:
 ```
-git clone https://github.com/rishy/data-tag.git
+    $ git clone https://github.com/rishy/data-tag.git
 ```
 
 Install all the dependencies using `npm install`:
 ```
-sudo npm install
+    $ npm install
 ```
 
 Install all the `bower` packages:
 ```
-bower install
+    $ bower install
 ```
 
-Use `grunt` tasks to run the client-side AngularJS Code:
-```
-grunt server
-```
-
-**NOTE:** You should have grunt-cli installed globally to run the above command
-.If not installed run:
-```
-npm install -g grunt-cli
-```
-
-for back-end, install a virtual environment in new flask directory using `install.sh` (or install.bat for Windows):
-```
-./install.sh
+for first time, install a virtual environment in root directory using `install.sh` (or `install.bat` for Windows):
+```python 
+    $ chmod +x install.sh
+    $ ./install.sh
 ```
 Keep your Cool, this will take a while to install all the dependencies. ;)
 
+##Commands
 
-Run the Service:
+Note:- First install `Fabric` to run below commands
+```shell
+    $ sudo pip install fabric
 ```
-flask/bin/python run.py
-```
-Your service will run at [http://localhost:5000](http://localhost:5000).
 
-The Grunt server will run at [http://localhost:9000](http://localhost:9000). It will proxy REST requests to the Flask service running at [http://localhost:5000](http://localhost:5000).
+To run an app :
+```
+    $ fab runapp
+```
+
+App Running on [http://127.0.0.1:5000/]([http://127.0.0.1:5000/])
 
 ## Contribution Guidelines
 

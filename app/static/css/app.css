@@ -22,6 +22,7 @@ body {
 
 /* Main marketing message and sign up button */
 .jumbotron {
+  color: rgb(58, 56, 56);
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
 }
@@ -59,10 +60,10 @@ body {
 }
 
 body{
-  background-color: #34495e; 
+  background-color: #34495e;
 }
 
-#tag-wrapper{  
+#tag-wrapper{
   color: #DBDBDB;
   text-align: center;
 }
@@ -80,7 +81,7 @@ body{
 #tag-wrapper ul li{
   padding: 5px 10px;
   background-color: #2C3D4E;
-  border-radius: 4px;  
+  border-radius: 4px;
   margin: 1%;
 
 }
