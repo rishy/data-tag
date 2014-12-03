@@ -1,7 +1,7 @@
 angular.module('data-tag')
   .controller('HomeController', ['$scope','$http', function ($scope, $http) {
 
-    $scope.page = {};
+    $scope.pages = {};
     $scope.showResult = false;
   	$scope.postData = function(text){
         // API target
@@ -14,7 +14,7 @@ angular.module('data-tag')
             console.log(data);
             // Returned data from API end
             $scope.showResult = true;
-            $scope.page = data;
+            $scope.pages = data;
         }).error(function(data, status){
             console.log(data);
             console.log("Failure");

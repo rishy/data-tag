@@ -2,9 +2,8 @@ enum
 flask
 flask-cors
 argparse
-grequests
-beautifulsoup4
 nltk
 numpy
-wikipedia
 pattern
+grequests
+pyquery

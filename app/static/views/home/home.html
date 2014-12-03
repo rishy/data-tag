@@ -6,10 +6,16 @@
 </div>
 
 <div ng-show="showResult" id="tag-wrapper">
-  <h4>This paragraph is about </h4> <h2><bold>{{ page.title}}</bold></h2>
-  <div class="jumbotron">
-      <h2>Summary</h2>
-      <p>{{ page.summary }}</p>
-      <a href="{{ page.url }}" target="_blank">Read More</a>
-  </div>
+  <ul>
+    <li ng-repeat="page in pages">
+      <h4>This paragraph is about </h4> <h2><bold>{{ page.title}}</bold></h2>
+      <div class="jumbotron">
+          <h2>Summary</h2>
+          <p>{{ page.summary }}</p>
+          <a href="{{ page.url }}" target="_blank">Read More</a>
+      </div>
+    </li>
+  </ul>
+
+
 </div>
