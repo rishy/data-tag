@@ -13,8 +13,8 @@ from flask import flash
 from flask import make_response
 from flask import jsonify
 from flask.ext.cors import CORS, cross_origin
-
 from app.wsd import get_result
+import json
 
 def is_contain(payload,*args):
     for a in args:
@@ -49,7 +49,9 @@ def apiTagit():
     # Get the result
     result = get_result(text)
 
-    return make_response(jsonify(result),200)
+    result = json.dumps(result)
+
+    return make_response(result,200)
 
 
 # app error handler

@@ -6,15 +6,13 @@ import numpy
 import json
 import re
 import string
-import wikipedia
 import operator
 from nltk.corpus import stopwords
 from operator import itemgetter
 from pattern.en import singularize
 from nltk.tokenize import RegexpTokenizer
 from string import digits
-from wikipedia.exceptions import DisambiguationError
-from page import Page
+from wikipedia import WikiApi
 
 # List of English Stopwords
 allStopWords = stopwords.words('english')
@@ -80,38 +78,26 @@ def overlapScore( sentence1, sentence2 ):
     gloss1 = gloss1.difference(functionwords)
     gloss2 = gloss2.difference(functionwords)
 
+    print gloss1.intersection(gloss2)
     # Return a score (i.e No. of words matched/No. of words in sentence)
     score = 0
     if(len(gloss2) > 0):
-        score = float(len(gloss1.intersection(gloss2)))/float(len(gloss2))
-
+        score = float(len(gloss1.intersection(gloss2)))
     return score
 
 
-# Uses WikiPedia API to fetch pages based on input nouns
+# Uses WikiPedia API to fetch articles based on input nouns
 def fetch_data_from_wiki(nouns):
     print("Fetching Data from Wikipedia...")
-    pages = []
-    titles = set()
+    wiki = WikiApi()
     try:
         for noun in nouns:
-            result = wikipedia.search(noun)
-            titles.update(result[:3])
+            titles = wiki.find(noun)
 
-        for title in titles:
-            print 'Fetching data of %s' % (title)
-            try:
-                page = wikipedia.page(title)
-                pages.append(Page(page))
-            except DisambiguationError:
-                print 'Disambiguation Error Raise'
-                pass
-            except:
-                print 'Other Wikipedia Error Raise'
-                pass
+        articles = wiki.get_articles(titles[:3])
     except:
         print 'Error in Wikipedia Api'
-    return pages
+    return articles
 
 
 # Join nouns which occurs together and delete repeated nouns
@@ -177,9 +163,10 @@ def noun_precisor(single_nouns, text):
 
 
     # Result contains raw joined nouns, Passed Joined and single nouns for filter
-    Nouns_wiki = multiple_noun_eliminator(result)
+    # Nouns_wiki = multiple_noun_eliminator(result)
 
-    return Nouns_wiki
+    # return Nouns_wiki
+    return result
 
 
 def multiple_noun_eliminator(joined_nouns):
@@ -283,16 +270,18 @@ def get_result(text):
     nouns = [ noun[0] for noun in all_nouns[:3] ]
     print nouns
 
-    pages = fetch_data_from_wiki(nouns)
-    for page in pages:
-        page.score = overlapScore(text, page.content)
+    articles = fetch_data_from_wiki(nouns)
+    for article in articles:
+        print '\n\n Heading %s \n' % (article.heading)
+        article.score = overlapScore(text, article.content)
+        print '\n\n'
 
-    for page in pages:
-        print 'Title %s and Score= %lf' % (page.title, page.score)
+    # Sort the articles in decreasing order of score
+    articles.sort(key=lambda article: article.score, reverse=True)
 
-    # Sort the pages in decreasing order of score
-    pages.sort(key=lambda page: page.score, reverse=True)
+    for article in articles:
+        print '%s has Score = %lf' % (article.heading, article.score)
 
-    final_page = pages[0].get_dict()
+    final_articles = [ article.get_dict() for article in articles[:3] ]
 
-    return final_page
+    return final_articles
