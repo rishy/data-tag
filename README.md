@@ -37,6 +37,11 @@ Note:- First install `Fabric` to run below commands
     $ sudo pip install fabric
 ```
 
+To install all dependencies in `requirements.txt`:
+```
+    $ fab installDep
+```
+
 To run an app :
 ```
     $ fab runapp
