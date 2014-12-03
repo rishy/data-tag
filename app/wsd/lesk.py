@@ -90,11 +90,12 @@ def overlapScore( sentence1, sentence2 ):
 def fetch_data_from_wiki(nouns):
     print("Fetching Data from Wikipedia...")
     wiki = WikiApi()
+    titles = []
     try:
         for noun in nouns:
-            titles = wiki.find(noun)
-
-        articles = wiki.get_articles(titles[:3])
+            suggestions = wiki.find(noun)
+            titles.extend(suggestions[:3])
+        articles = wiki.get_articles(titles)
     except:
         print 'Error in Wikipedia Api'
     return articles
