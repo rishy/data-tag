@@ -7,3 +7,4 @@ numpy
 pattern
 grequests
 pyquery
+wikipedia

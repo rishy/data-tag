@@ -5,14 +5,18 @@ import nltk
 import numpy
 import json
 import re
+import math
 import string
 import operator
+import wikipedia
+import traceback
+import collections
 from nltk.corpus import stopwords
 from operator import itemgetter
 from pattern.en import singularize
 from nltk.tokenize import RegexpTokenizer
 from string import digits
-from wikipedia import WikiApi
+from wiki import WikiApi
 
 # List of English Stopwords
 allStopWords = stopwords.words('english')
@@ -64,25 +68,36 @@ def refineSentence(sentence):
 
     return words
 
+def intersection(text1, text2):
+    score = 0
+
+    # A counter object for holding counts of words in text2
+    c = collections.Counter(text2)
+
+    # For distinct words in text1
+    for word in set(text1):
+        # If this word is in text2 as well
+        # then add all of its occurrences in score
+        if word in text2:
+            score += c[word]
+
+    return score
 
 def overlapScore( sentence1, sentence2 ):
     # Refine both sentences (i.e eliminate unwanted symbols,words)
     words1 = refineSentence(sentence1)
     words2 = refineSentence(sentence2)
 
-    # Convert list to set of words
-    gloss1 = set(words1)
-    gloss2 = set(words2)
+    gloss1 = [word for word in words1 if word not in functionwords]
+    gloss2 = [word for word in words2 if word not in functionwords]
 
-    # Remove Function Words from the set of glosses
-    gloss1 = gloss1.difference(functionwords)
-    gloss2 = gloss2.difference(functionwords)
+    overlap = intersection(gloss1, gloss2)
 
-    print gloss1.intersection(gloss2)
-    # Return a score (i.e No. of words matched/No. of words in sentence)
+    # Return a score using 
+    # https://drive.google.com/file/d/0ByirQonZ9d0HMDVycFlRX3BLa2s/view
     score = 0
     if(len(gloss2) > 0):
-        score = float(len(gloss1.intersection(gloss2)))
+        score = float(math.tanh(float(overlap/(float(len(gloss1) + len(gloss2))))))
     return score
 
 
@@ -90,13 +105,17 @@ def overlapScore( sentence1, sentence2 ):
 def fetch_data_from_wiki(nouns):
     print("Fetching Data from Wikipedia...")
     wiki = WikiApi()
-    titles = []
-    try:
+    articles = []
+    try:   
+        titles = []     
         for noun in nouns:
-            suggestions = wiki.find(noun)
-            titles.extend(suggestions[:3])
-        articles = wiki.get_articles(titles)
+            suggestions = wikipedia.search(noun)
+            titles.extend(suggestions[:5])
+
+        titles = [ title.encode('utf-8') for title in titles]
+        articles = wiki.get_articles(titles[:])
     except:
+        print traceback.format_exc()
         print 'Error in Wikipedia Api'
     return articles
 

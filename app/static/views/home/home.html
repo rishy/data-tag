@@ -10,8 +10,9 @@
     <li ng-repeat="page in pages">      
       <div class="jumbotron">
         <h2><bold>{{page.heading}}</bold></h2>
-          <p>{{ page.summary }}...</p>
-          <a href="{{ page.url }}" target="_blank">Read More</a>
+          <p>
+            {{ page.summary }}...<a href="{{ page.url }}" target="_blank">Read More</a>
+          </p>          
       </div>
     </li>
   </ul>

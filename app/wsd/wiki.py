@@ -202,7 +202,7 @@ class Article:
         res = {}
         res['heading'] = self.heading
         res['image'] = self.image
-        res['summary'] = self.summary
+        res['summary'] = self.summary[:500].strip()
         res['content'] = self.content
         res['references'] = self.references
         res['url'] = self.url
