@@ -79,9 +79,20 @@ body{
 }
 
 #tag-wrapper ul li{
-  padding: 5px 10px;
+  padding: 10px;
   background-color: #2C3D4E;
   border-radius: 4px;
   margin: 1%;
+}
 
+#tag-wrapper ul li div{
+  padding: 20px;
+  font-size: 17px;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+#tag-wrapper ul li div h2{
+  text-align: center;
 }
