@@ -110,6 +110,7 @@ def fetch_data_from_wiki(nouns):
         titles = []     
         for noun in nouns:
             suggestions = wikipedia.search(noun)
+            # Only looks for first five titles found with this word
             titles.extend(suggestions[:5])
 
         titles = [ title.encode('utf-8') for title in titles]
@@ -183,9 +184,9 @@ def noun_precisor(single_nouns, text):
 
 
     # Result contains raw joined nouns, Passed Joined and single nouns for filter
-    # Nouns_wiki = multiple_noun_eliminator(result)
+    # joined_nouns = multiple_noun_eliminator(result)
 
-    # return Nouns_wiki
+    # return joined_nouns
     return result
 
 
@@ -266,14 +267,11 @@ def get_result(text):
     # Gets the sorted nouns_counts according to the no. of occurrences
     nouns_counts = sorted(nouns_counts.items(), key=operator.itemgetter(1), reverse = True)
 
-    # Nouns to be passed to wikipedia API
-    top_nouns = nouns_counts[:]
-
     # Get precise nouns (join nouns which occur together)
-    Nouns_wiki = noun_precisor(top_nouns, text)
+    joined_nouns = noun_precisor(nouns_counts, text)
 
     # Adds up the count of singular and plural nouns
-    for k,v in Nouns_wiki.items():
+    for k,v in joined_nouns.items():
 
         token = nltk.pos_tag(nltk.tokenize.word_tokenize(k))
         print token
@@ -281,13 +279,22 @@ def get_result(text):
 
             singular = singularize(k);
 
-            if k != singular and Nouns_wiki.has_key(singular):
-                Nouns_wiki[k] = Nouns_wiki[k] + Nouns_wiki[singular]
-                del Nouns_wiki[singular]
+            if k != singular and joined_nouns.has_key(singular):
+                joined_nouns[k] = joined_nouns[k] + joined_nouns[singular]
+                del joined_nouns[singular]
 
-    all_nouns = sorted(Nouns_wiki.items(), key=operator.itemgetter(1), reverse = True)
+    all_nouns = sorted(joined_nouns.items(), key=operator.itemgetter(1), reverse = True)
 
-    nouns = [ noun[0] for noun in all_nouns[:3] ]
+    print len(all_nouns)
+    print len(text.split(' '))
+    # No. of nouns qualified to pass to Wikipedia API
+    qualifiers_count = 3 + int(math.floor(math.tanh(len(all_nouns)/float(len(text.split(' ')))) * 7))
+    
+    # If qualifiers_count exceeds total number of nouns found(highly unlikely)
+    if len(all_nouns) < qualifiers_count:
+        qualifiers_count = len(all_nouns)
+
+    nouns = [ noun[0] for noun in all_nouns[:qualifiers_count] ]
     print nouns
 
     articles = fetch_data_from_wiki(nouns)
