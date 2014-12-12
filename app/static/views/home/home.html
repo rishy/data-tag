@@ -1,18 +1,41 @@
 <div class="jumbotron">
-  <div class="input-group">
-    <textarea class="form-control custom-control" rows="5" style="resize:none" ng-model="input.text"></textarea>
-    	<span class="input-group-addon btn btn-primary" ng-click="postData(input.text)">Tag It!</span>
-  </div>
+    <div class="row">
+      <div class="col-md-offset-7 col-sm-offset-6 col-xs-offset-6">
+        <ul class="nav nav-tabs">
+          <li ng-click="navtab('url')"  ng-class="{active: tab.url == true}" role="button"><a href=""><span class="glyphicon glyphicon-link"></span>&nbsp;&nbsp; Url</a></li>
+          <li ng-click="navtab('text')" ng-class="{active: tab.text == true}" role="button"><a href=""><span class="glyphicon glyphicon-font"></span>&nbsp;Text</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+        <div ng-show="tab.url">
+            <div class="input-group input-group-lg">
+                    <span class="input-group-addon glyphicon glyphicon-header"></span>
+                    <input type="url" class="form-control" placeholder="http://www.target-site.com" ng-model="input.url" />
+            </div>
+        </div>
+        <div ng-show="tab.text">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon glyphicon glyphicon-pencil"></span>
+                <input type="text" class="form-control" placeholder="Feed text"ng-model="input.text" />
+            </div>
+        </div>
+    </div>
+    <p></p>
+    <div class="row">
+     <div class="col-sm-offset-3 col-sm-6">
+        <span class="input-group-addon btn btn-primary" ng-click="postData(input.text)"><span class="glyphicon glyphicon-search"></span>&nbsp;&nbsp;Tag It!</span>
+    </div>
 </div>
 
 <div ng-show="showResult" id="tag-wrapper">
   <ul>
-    <li ng-repeat="page in pages">      
+    <li ng-repeat="page in pages">
       <div class="jumbotron">
         <h2><bold>{{page.heading}}</bold></h2>
           <p>
             {{ page.summary }}...<a href="{{ page.url }}" target="_blank">Read More</a>
-          </p>          
+          </p>
       </div>
     </li>
   </ul>
