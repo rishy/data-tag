@@ -22,9 +22,6 @@ from worker import qL
 from worker import rDB
 from redis_collections import Dict
 
-# List of English Stopwords
-allStopWords = stopwords.words('english')
-
 # Regex holder for noun terms
 regex = re.compile("NN.*")
 
@@ -50,6 +47,9 @@ functionwords = ['about', 'across', 'against', 'along', 'around', 'at',
                  'never', 'sometimes', 'usually', 'often', 'therefore',
                  'however', 'besides', 'moreover', 'though', 'otherwise',
                  'else', 'instead', 'anyway', 'incidentally', 'meanwhile']
+
+# List of all Stopwords
+allStopWords = set(stopwords.words('english')).union(functionwords)
 
 def refineSentence(sentence):
     # Convert unicode to string
@@ -89,11 +89,8 @@ def intersection(text1, text2):
 
 def overlapScore( sentence1, sentence2 ):
     # Refine both sentences (i.e eliminate unwanted symbols,words)
-    words1 = refineSentence(sentence1)
-    words2 = refineSentence(sentence2)
-
-    gloss1 = [word for word in words1 if word not in functionwords]
-    gloss2 = [word for word in words2 if word not in functionwords]
+    gloss1 = refineSentence(sentence1)
+    gloss2 = refineSentence(sentence2)
 
     overlap = intersection(gloss1, gloss2)
 
@@ -117,8 +114,8 @@ def fetch_data_from_wiki(nouns):
             # Only looks for first five titles found with this word
             titles.extend(suggestions[:5])
 
-        titles = [ title.encode('utf-8') for title in titles]
-        articles = wiki.get_articles(titles[:])
+        titles = set([ title.encode('utf-8') for title in titles])
+        articles = wiki.get_articles(titles)
     except:
         print traceback.format_exc()
         print 'Error in Wikipedia Api'
@@ -126,28 +123,32 @@ def fetch_data_from_wiki(nouns):
 
 
 # Join nouns which occurs together and delete repeated nouns
-def noun_precisor(single_nouns, text):
+def join_nouns(single_nouns, text):
 
     # Incoming list Data to dictionary
     raw_nouns_single = {}
 
+    # Get a punctuation set
     puncset = set(string.punctuation)
 
     for x in single_nouns:
-        t_str = x[0].capitalize()
+        
+        t_str = single_nouns[x].capitalize()
         s = ''.join(ch for ch in t_str if ch not in puncset)
-        raw_nouns_single[s] = x[1]
+        raw_nouns_single[s] = t_str
+
     #print raw_nouns_single
     #print text
 
-    # List of content, input text splitted into single word excluding (.)
+    # List of content, input text splitted into single word excluding these
     puncset.remove('.')
     puncset.remove(',')
     puncset.remove(';')
+    puncset.remove('-')
+    puncset.remove('_')
     res = "".join(c for c in text if c not in puncset)
-    listofcontent =  re.findall(r"[\w']+|[.,;]",res)
 
-    #print listofcontent
+    listofcontent =  re.findall(r"[\w']+|[.,;]",res)
 
     temp_nouns = []
     result = {}
@@ -181,11 +182,12 @@ def noun_precisor(single_nouns, text):
     if(blank_key in result.keys()):
         del result[blank_key]
 
-    print "---Raw Joined_Nouns(Contain multiple joined nouns)------"
-    #print result
-    for x,v in result.iteritems():
-        print x, " - ", v
+    # Ranks nouns according to thier position in text
+    for x in result:
+        noun = result[x]
 
+        # Count no. of occurences of current singular word in text
+        result[x] = noun - (text.lower().find(x.lower())/float(len(text.split(' ')) * 100))
 
     # Result contains raw joined nouns, Passed Joined and single nouns for filter
     # joined_nouns = multiple_noun_eliminator(result)
@@ -240,42 +242,28 @@ def multiple_noun_eliminator(joined_nouns):
     return joined_nouns
 
 def get_nouns(text):
+
+    # Remove unwanted symbols from text and tokenize it
+    refined_text = refineSentence(text)
+
     # Dict to store nouns
     nouns = {}
 
     # Dict to store nouns counts
-    nouns_counts = {}
+    ranks = {}
 
     # Tokenize input text using NLTK
-    data = set(nltk.pos_tag(nltk.tokenize.word_tokenize(text.lower())))
+    data = set(nltk.pos_tag(refined_text))
 
-    for word in data:
-
-        w = word[0]
-
-        # Singularizing proper, singular, nouns(NNP) may result in errors
-        if regex.match(word[1]) and w not in nouns.keys() and w not in allStopWords:
-
-            nouns[w] = w.capitalize()
-
-            # Tokenize all the words in input text
-            token = nltk.tokenize.word_tokenize(text.lower())
-
-            # Count no. of occurences of current singular word in text
-            nouns_counts[w] = token.count(w)
-
-            # If word has been singularized, also count its original plural form
-            if w != w:
-                nouns_counts[w] += token.count(w)
-
-    # Gets the sorted nouns_counts according to the no. of occurrences
-    nouns_counts = sorted(nouns_counts.items(), key=operator.itemgetter(1), reverse = True)
-
-    # Get precise nouns (join nouns which occur together)
-    joined_nouns = noun_precisor(nouns_counts, text)
+    for k,v in data:
+        if regex.match(v):
+            nouns[k] = k.capitalize()           
+    
+    # Get joined adjacent nouns and ranks
+    ranks = join_nouns(nouns, text)    
 
     # Adds up the count of singular and plural nouns
-    for k,v in joined_nouns.items():
+    for k,v in ranks.items():
 
         token = nltk.pos_tag(nltk.tokenize.word_tokenize(k))
         print token
@@ -283,17 +271,18 @@ def get_nouns(text):
 
             singular = singularize(k);
 
-            if k != singular and joined_nouns.has_key(singular):
-                joined_nouns[k] = joined_nouns[k] + joined_nouns[singular]
-                del joined_nouns[singular]
+            if k != singular and ranks.has_key(singular):
+                ranks[k] = ranks[k] + ranks[singular]
+                del ranks[singular]
 
-    all_nouns = sorted(joined_nouns.items(), key=operator.itemgetter(1), reverse = True)
+    all_nouns = sorted(ranks.items(), key=operator.itemgetter(1), reverse = True)
 
+    print all_nouns
     print len(all_nouns)
     print len(text.split(' '))
     # No. of nouns qualified to pass to Wikipedia API
-    qualifiers_count = 3 + int(math.floor(math.tanh(len(all_nouns)/float(len(text.split(' ')))) * 7))
-
+    qualifiers_count = 3 + int(math.floor(math.tanh(len(all_nouns)/float(len(text.split(' '))) * 7)))
+    
     # If qualifiers_count exceeds total number of nouns found(highly unlikely)
     if len(all_nouns) < qualifiers_count:
         qualifiers_count = len(all_nouns)
@@ -302,7 +291,7 @@ def get_nouns(text):
     print nouns
 
     d = Dict(redis=rDB)
-    d.update({'text' : text, 'nouns' : nouns, 'all_nouns' : all_nouns})
+    d.update({'text' : text, 'nouns' : nouns})
 
     response = dict()
     response.update({'id' : d.key, 'nouns': nouns })
@@ -317,7 +306,7 @@ def process_job(job_key):
     articles = fetch_data_from_wiki(data['nouns'])
     for article in articles:
         print '\n\n Heading %s \n' % (article.heading)
-        article.score = overlapScore(data['all_nouns'], article.content)
+        article.score = overlapScore(data['text'], article.content)
         print '\n\n'
 
     # Sort the articles in decreasing order of score
