@@ -5,7 +5,7 @@ angular.module('data-tag')
     $scope.tab = {};
     $scope.tab.url = true;
     $scope.tab.text = false;
-   
+
     // Object for data
     $scope.input = {};
     $scope.input.type = null;
@@ -13,12 +13,16 @@ angular.module('data-tag')
     $scope.input.link = null;
     $scope.processing = false;
 
+    $scope.tab = {};
+    $scope.tab.url = true;
+    $scope.tab.text = false;
+
     $scope.pages = {};
     $scope.showResult = false;
     $scope.showNoun = new Array(18);
     var load_interval;
     var blink_interval;
-    
+
     $scope.result = {};
 
   	$scope.postData = function(){
@@ -64,7 +68,7 @@ angular.module('data-tag')
                 req = { 'id': $scope.result.id };
                 $http.post(url2, req).success(function(data, status){
                     console.log("Text Sent!");
-                    console.log(data);   
+                    console.log(data);
                     // Remove $interval once tags have been fetched
                     if(data.status == 'finished'){
                         $interval.cancel(interval);
@@ -72,7 +76,7 @@ angular.module('data-tag')
                         $interval.cancel(blink_interval);
                         $scope.result = data;
                         // show the tags section with wikipedia summary
-                        $scope.showResult = true;   
+                        $scope.showResult = true;
                     }
                     //  here result object has three properties
                     //  result.id => job key
@@ -86,7 +90,22 @@ angular.module('data-tag')
         }, 500);
 
   	}
+    console.log($scope.tab);
+    //console.log($scope.tab);
+    $scope.navtab = function(value){
+        if (value==="url") {
+            $scope.tab.text = false;
+            $scope.tab.url = true;
+            console.log($scope.tab);
+        }
+        else{
+            $scope.tab.text = true;
+            $scope.tab.url = false;
+            console.log($scope.tab);
+        }
+    }
 
+<<<<<<< HEAD
     $scope.navtab = function(value){
         if (value==="url") {
             $scope.tab.text = false;
@@ -115,13 +134,13 @@ angular.module('data-tag')
 
             // Hide all the nouns again
             $timeout(function(){
-                $scope.showNoun = new Array(18);                
-            }, 900);            
+                $scope.showNoun = new Array(18);
+            }, 900);
 
             // Shuffle the nouns
-            $scope.nouns = shuffle($scope.nouns);   
-            
-        }, 1000);       
+            $scope.nouns = shuffle($scope.nouns);
+
+        }, 1000);
 
     }
 
@@ -129,9 +148,9 @@ angular.module('data-tag')
 
         blink_interval = $interval(function(){
             // Blink processing
-            $scope.processing = !$scope.processing; 
+            $scope.processing = !$scope.processing;
         }, 900);
-        
+
     }
 
     //+ Jonas Raoni Soares Silva
@@ -141,4 +160,6 @@ angular.module('data-tag')
         return o;
     }
 
+=======
+>>>>>>> feat(ui): input url field added along with navigation
 }]);
