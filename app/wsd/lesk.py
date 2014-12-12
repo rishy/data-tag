@@ -17,6 +17,10 @@ from pattern.en import singularize
 from nltk.tokenize import RegexpTokenizer
 from string import digits
 from wiki import WikiApi
+from worker import qH
+from worker import qL
+from worker import rDB
+from redis_collections import Dict
 
 # List of English Stopwords
 allStopWords = stopwords.words('english')
@@ -93,7 +97,7 @@ def overlapScore( sentence1, sentence2 ):
 
     overlap = intersection(gloss1, gloss2)
 
-    # Return a score using 
+    # Return a score using
     # https://drive.google.com/file/d/0ByirQonZ9d0HMDVycFlRX3BLa2s/view
     score = 0
     if(len(gloss2) > 0):
@@ -106,8 +110,8 @@ def fetch_data_from_wiki(nouns):
     print("Fetching Data from Wikipedia...")
     wiki = WikiApi()
     articles = []
-    try:   
-        titles = []     
+    try:
+        titles = []
         for noun in nouns:
             suggestions = wikipedia.search(noun)
             # Only looks for first five titles found with this word
@@ -235,7 +239,7 @@ def multiple_noun_eliminator(joined_nouns):
 
     return joined_nouns
 
-def get_result(text):
+def get_nouns(text):
     # Dict to store nouns
     nouns = {}
 
@@ -297,10 +301,25 @@ def get_result(text):
     nouns = [ noun[0] for noun in all_nouns[:qualifiers_count] ]
     print nouns
 
-    articles = fetch_data_from_wiki(nouns)
+    d = Dict(redis=rDB)
+    d.update({'text' : text, 'nouns' : nouns})
+
+    response = dict()
+    response.update({'id' : d.key, 'nouns': nouns })
+
+    print d
+
+    # Enqueue job in redis-queue
+    qH.enqueue(process_job, d.key)
+
+    return response
+
+def process_job(job_key):
+    data = Dict(key=job_key)
+    articles = fetch_data_from_wiki(data['nouns'])
     for article in articles:
         print '\n\n Heading %s \n' % (article.heading)
-        article.score = overlapScore(text, article.content)
+        article.score = overlapScore(data['text'], article.content)
         print '\n\n'
 
     # Sort the articles in decreasing order of score
@@ -311,4 +330,11 @@ def get_result(text):
 
     final_articles = [ article.get_dict() for article in articles[:3] ]
 
-    return final_articles
+    data.update({ 'result' : final_articles })
+
+
+def get_result(job_key):
+    data = Dict(key=job_key)
+    return data
+
+

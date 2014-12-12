@@ -47,6 +47,31 @@ def apiTagit():
     text = request.json['text']
 
     # Get the result
+    result = get_nouns(text)
+
+    result = json.dumps(result)
+
+    return make_response(result,200)
+
+# Routing for tagit api
+@app.route('/api/tagit/v1.0/result/', methods= ['OPTIONS','POST'])
+@cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+def apiTagit():
+    print 'I got an api request'
+    print 'Method Type: %s' % request.method
+    print 'Content : %s' % request.json
+    print request.headers
+    if request.method == 'OPTIONS':
+        return make_response(jsonify({"Allow":"POST"}),200)
+
+    if not request.json or not is_contain(request.json,'id'):
+        print 'Bad Request'
+        abort(400)
+
+    # Get the job-key from json request data
+    key = request.json['id']
+
+    # Get the result
     result = get_result(text)
 
     result = json.dumps(result)
