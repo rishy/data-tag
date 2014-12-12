@@ -8,3 +8,6 @@ pattern
 grequests
 pyquery
 wikipedia
+redis
+rq
+redis-collections

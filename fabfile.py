@@ -9,3 +9,6 @@ def installDep():
 def runapp():
     local('flask/bin/python run.py')
 
+def runworker():
+    local('flask/bin/python worker.py')
+
