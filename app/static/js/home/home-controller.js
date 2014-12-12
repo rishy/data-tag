@@ -1,6 +1,10 @@
 angular.module('data-tag')
   .controller('HomeController', ['$scope','$http', function ($scope, $http) {
 
+    $scope.tab = {};
+    $scope.tab.url = true;
+    $scope.tab.text = false;
+
     $scope.pages = {};
     $scope.showResult = false;
   	$scope.postData = function(text){
@@ -19,7 +23,20 @@ angular.module('data-tag')
             console.log(data);
             console.log("Failure");
         })
-
   	}
+    console.log($scope.tab);
+    //console.log($scope.tab);
+    $scope.navtab = function(value){
+        if (value==="url") {
+            $scope.tab.text = false;
+            $scope.tab.url = true;
+            console.log($scope.tab);
+        }
+        else{
+            $scope.tab.text = true;
+            $scope.tab.url = false;
+            console.log($scope.tab);
+        }
+    }
 
-  }]);
+}]);
