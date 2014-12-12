@@ -2,3 +2,4 @@
 # -*- coding: utf-8 -*-
 
 from lesk import get_result
+from lesk import get_nouns

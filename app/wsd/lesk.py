@@ -293,7 +293,7 @@ def get_nouns(text):
     print len(text.split(' '))
     # No. of nouns qualified to pass to Wikipedia API
     qualifiers_count = 3 + int(math.floor(math.tanh(len(all_nouns)/float(len(text.split(' ')))) * 7))
-    
+
     # If qualifiers_count exceeds total number of nouns found(highly unlikely)
     if len(all_nouns) < qualifiers_count:
         qualifiers_count = len(all_nouns)
@@ -302,12 +302,10 @@ def get_nouns(text):
     print nouns
 
     d = Dict(redis=rDB)
-    d.update({'text' : text, 'nouns' : nouns})
+    d.update({'text' : text, 'nouns' : nouns, 'all_nouns' : all_nouns})
 
     response = dict()
     response.update({'id' : d.key, 'nouns': nouns })
-
-    print d
 
     # Enqueue job in redis-queue
     qH.enqueue(process_job, d.key)
@@ -319,7 +317,7 @@ def process_job(job_key):
     articles = fetch_data_from_wiki(data['nouns'])
     for article in articles:
         print '\n\n Heading %s \n' % (article.heading)
-        article.score = overlapScore(data['text'], article.content)
+        article.score = overlapScore(data['all_nouns'], article.content)
         print '\n\n'
 
     # Sort the articles in decreasing order of score
@@ -335,6 +333,7 @@ def process_job(job_key):
 
 def get_result(job_key):
     data = Dict(key=job_key)
-    return data
+    result = data['result']
+    return result
 
 
