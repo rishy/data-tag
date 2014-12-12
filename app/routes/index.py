@@ -13,7 +13,7 @@ from flask import flash
 from flask import make_response
 from flask import jsonify
 from flask.ext.cors import CORS, cross_origin
-from app.wsd import get_result
+from app.wsd import get_nouns, get_result
 import json
 
 def is_contain(payload,*args):
@@ -53,11 +53,12 @@ def apiTagit():
 
     return make_response(result,200)
 
+
 # Routing for tagit api
 @app.route('/api/tagit/v1.0/result/', methods= ['OPTIONS','POST'])
 @cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
-def apiTagit():
-    print 'I got an api request'
+def result():
+    print 'I got an result api request'
     print 'Method Type: %s' % request.method
     print 'Content : %s' % request.json
     print request.headers
@@ -72,7 +73,7 @@ def apiTagit():
     key = request.json['id']
 
     # Get the result
-    result = get_result(text)
+    result = get_result(key)
 
     result = json.dumps(result)
 
