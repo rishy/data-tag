@@ -9,5 +9,6 @@ grequests
 pyquery
 wikipedia
 redis
+urllib3
 rq
 redis-collections

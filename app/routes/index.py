@@ -13,7 +13,7 @@ from flask import flash
 from flask import make_response
 from flask import jsonify
 from flask.ext.cors import CORS, cross_origin
-from app.wsd import get_nouns, get_result
+from app.wsd import get_nouns, get_result, scrape_text
 import json
 
 def is_contain(payload,*args):
@@ -43,8 +43,21 @@ def apiTagit():
         print 'Bad Request'
         abort(400)
 
-    # Get the text from json request data
-    text = request.json['text']
+    #Get the datatype [link, text]
+    datatype = request.json['type']
+    print datatype
+    if datatype == "link":
+        url = request.json['link']
+        print "Link Processing"
+        #Text from website
+        text = scrape_text(url)
+        if text == "Error":
+            print "Link Dead"
+        else:
+            pass
+    else:
+        # Get the text from json request data
+        text = request.json['text']
 
     # Get the result
     result = get_nouns(text)
