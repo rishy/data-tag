@@ -11,6 +11,8 @@ import operator
 import wikipedia
 import traceback
 import collections
+from bs4 import BeautifulSoup
+from urllib3 import PoolManager
 from nltk.corpus import stopwords
 from operator import itemgetter
 from pattern.en import singularize
@@ -132,7 +134,7 @@ def join_nouns(single_nouns, text):
     puncset = set(string.punctuation)
 
     for x in single_nouns:
-        
+
         t_str = single_nouns[x].capitalize()
         s = ''.join(ch for ch in t_str if ch not in puncset)
         raw_nouns_single[s] = t_str
@@ -257,10 +259,10 @@ def get_nouns(text):
 
     for k,v in data:
         if regex.match(v):
-            nouns[k] = k.capitalize()           
-    
+            nouns[k] = k.capitalize()
+
     # Get joined adjacent nouns and ranks
-    ranks = join_nouns(nouns, text)    
+    ranks = join_nouns(nouns, text)
 
     # Adds up the count of singular and plural nouns
     for k,v in ranks.items():
@@ -282,7 +284,7 @@ def get_nouns(text):
     print len(text.split(' '))
     # No. of nouns qualified to pass to Wikipedia API
     qualifiers_count = 3 + int(math.floor(math.tanh(len(all_nouns)/float(len(text.split(' '))) * 7)))
-    
+
     # If qualifiers_count exceeds total number of nouns found(highly unlikely)
     if len(all_nouns) < qualifiers_count:
         qualifiers_count = len(all_nouns)
@@ -325,4 +327,17 @@ def get_result(job_key):
     result = data['result']
     return result
 
-
+def scrape_text(url):
+    #PoolManager keep the connection state
+    http = PoolManager()
+    r = http.request('GET', url)
+    print r.status
+    if r.status == 200:
+        webhtml = r.data
+        soup = BeautifulSoup(webhtml)
+        rawtext = soup.get_text()
+        cleantext = ' '.join(rawtext.split())
+        print "Successfully Text Obtained"
+        return cleantext
+    else:
+        return "Error"
