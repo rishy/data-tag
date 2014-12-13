@@ -48,7 +48,7 @@ def apiTagit():
     print datatype
     if datatype == "link":
         url = request.json['link']
-        print "Link Processing"
+        print "Fetching URL Data"
         #Text from website
         text = scrape_text(url)
         if text == "Error":

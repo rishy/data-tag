@@ -48,7 +48,8 @@ functionwords = ['about', 'across', 'against', 'along', 'around', 'at',
                  'should', 'must', 'here', 'there', 'now', 'then', 'always',
                  'never', 'sometimes', 'usually', 'often', 'therefore',
                  'however', 'besides', 'moreover', 'though', 'otherwise',
-                 'else', 'instead', 'anyway', 'incidentally', 'meanwhile']
+                 'else', 'instead', 'anyway', 'incidentally', 'meanwhile',
+                 'article', 'articles']
 
 # List of all Stopwords
 allStopWords = set(stopwords.words('english')).union(functionwords)
@@ -335,9 +336,14 @@ def scrape_text(url):
     if r.status == 200:
         webhtml = r.data
         soup = BeautifulSoup(webhtml)
-        rawtext = soup.get_text()
-        cleantext = ' '.join(rawtext.split())
-        print "Successfully Text Obtained"
-        return cleantext
+
+        # Just get the (meaningful) data fromparas and article tags
+        text = '.'.join([str(article) for article in soup.find_all('article')])
+        text = text + " " + '.'.join([str(para) for para in soup.find_all('p')])
+
+        # Get the textual content from paras and article tags
+        rawtext = BeautifulSoup(text).get_text()
+        print "URL content fetched"
+        return rawtext
     else:
         return "Error"
