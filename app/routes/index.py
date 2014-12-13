@@ -81,7 +81,6 @@ def result():
     if not request.json or not is_contain(request.json,'id'):
         print 'Bad Request'
         abort(400)
-
     # Get the job-key from json request data
     key = request.json['id']
 

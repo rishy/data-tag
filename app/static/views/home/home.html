@@ -26,6 +26,34 @@
      <div class="col-sm-offset-3 col-sm-6">
         <span class="input-group-addon btn btn-primary" ng-click="postData()"><span class="glyphicon glyphicon-search"></span>&nbsp;&nbsp;Tag It!</span>
     </div>
+  </div>
+</div>
+
+<div ng-show="!showResult && nouns" id="loader">
+  <ul>
+    <li ng-show='showNoun[0]'>{{nouns[0]}}</li>
+    <li ng-show='showNoun[1]'>{{nouns[1]}}</li>
+    <li ng-show='showNoun[2]'>{{nouns[2]}}</li>
+    <li ng-show='showNoun[3]'>{{nouns[3]}}</li>
+    <li ng-show='showNoun[4]'>{{nouns[4]}}</li>
+    <li ng-show='showNoun[5]'>{{nouns[5]}}</li>
+  </ul>
+  <ul>
+    <li ng-show='showNoun[6]'>{{nouns[6]}}</li>
+    <li ng-show='showNoun[7]'>{{nouns[7]}}</li>
+    <li ng-show='showNoun[8]'>{{nouns[8]}}</li>
+    <li ng-show='showNoun[9]'>{{nouns[9]}}</li>
+    <li ng-show='showNoun[10]'>{{nouns[10]}}</li>
+    <li ng-show='showNoun[11]'>{{nouns[11]}}</li>
+  </ul>
+  <ul>
+    <li ng-show='showNoun[12]'>{{nouns[12]}}</li>
+    <li ng-show='showNoun[13]'>{{nouns[13]}}</li>
+    <li ng-show='showNoun[14]'>{{nouns[14]}}</li>
+    <li ng-show='showNoun[15]'>{{nouns[15]}}</li>
+    <li ng-show='showNoun[16]'>{{nouns[16]}}</li>
+    <li ng-show='showNoun[17]'>{{nouns[17]}}</li>
+  </ul>
 </div>
 
 <div ng-show="showResult" id="tag-wrapper">

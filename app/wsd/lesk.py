@@ -293,8 +293,12 @@ def get_nouns(text):
     nouns = [ noun[0] for noun in all_nouns[:qualifiers_count] ]
     print nouns
 
+    loader_nouns = 36;
+    if len(all_nouns) < 36:
+        loader_nouns = len(all_nouns)
+
     d = Dict(redis=rDB)
-    d.update({'text' : text, 'all_nouns' : all_nouns, 'nouns' : nouns , 'status' : 'pending' })
+    d.update({'text' : text, 'all_nouns' : [noun[0] for noun in all_nouns[:loader_nouns]], 'nouns' : nouns , 'status' : 'pending' })
 
     response = dict()
     response.update({'id' : d.key, 'all_nouns': d['all_nouns'], 'status': d['status'] })

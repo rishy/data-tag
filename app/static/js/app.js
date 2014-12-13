@@ -1,5 +1,5 @@
 // Declare app level module which depends on filters, and services
-var datatag = angular.module('data-tag', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.date']);
+var datatag = angular.module('data-tag', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.date', 'ngAnimate']);
 
 datatag.config(['$routeProvider', function ($routeProvider) {
     $routeProvider

@@ -68,7 +68,7 @@ body{
   text-align: center;
 }
 
-#tag-wrapper ul{
+#tag-wrapper ul, #loader ul{
   list-style-type: none;
   margin: auto;
   padding: 0;
@@ -78,7 +78,7 @@ body{
   flex-wrap: wrap;
 }
 
-#tag-wrapper ul li{
+#tag-wrapper ul li, #loader ul li{
   padding: 10px;
   background-color: #2C3D4E;
   border-radius: 4px;
@@ -95,4 +95,67 @@ body{
 
 #tag-wrapper ul li div h2{
   text-align: center;
+}
+
+#processing{  
+  color: #DBDBDB;
+  text-align: center;
+  margin: 0 auto;
+}
+
+#loader{
+  color: #DBDBDB;
+  text-align: center;
+}
+
+#loader ul li{
+  padding: 5px 10px;
+  position: relative;
+}
+
+/*------------------Angular Animations---------------*/
+
+.ng-enter {
+  opacity: 0;
+  margin-top: -2%;
+  transition: 0.3s all ease-out;
+}
+
+.ng-enter.ng-enter-active {
+  opacity: 1;
+  margin-top: 0%;
+}
+
+.ng-leave {
+  opacity: 0;
+}
+
+.ng-hide-add, .ng-hide-remove {
+  display: block !important;
+}
+
+.ng-hide-add,.ng-hide-remove,
+.ng-hide-add.ng-hide-add-active,
+.ng-hide-remove.ng-hide-remove-active {
+  transition:0.3s all ease-out;
+}
+
+.ng-hide-add,
+.ng-hide-remove.ng-hide-remove-active {
+  padding-left: 0px;
+  opacity: 1;
+}
+
+.ng-hide-remove,
+.ng-hide-add.ng-hide-add-active {
+  opacity:0;
+  padding-left: 10px;
+}
+
+.row .ng-hide-remove, .row .ng-hide-add {
+  transition: 0s all linear !important;
+}
+
+#processing .ng-hide-remove, #processing .ng-hide-add {
+  transition: 0s all linear !important;
 }
