@@ -294,10 +294,10 @@ def get_nouns(text):
     print nouns
 
     d = Dict(redis=rDB)
-    d.update({'text' : text, 'nouns' : nouns})
+    d.update({'text' : text, 'all_nouns' : all_nouns, 'nouns' : nouns , 'status' : 'pending' })
 
     response = dict()
-    response.update({'id' : d.key, 'nouns': nouns })
+    response.update({'id' : d.key, 'all_nouns': d['all_nouns'], 'status': d['status'] })
 
     # Enqueue job in redis-queue
     qH.enqueue(process_job, d.key)
@@ -306,6 +306,8 @@ def get_nouns(text):
 
 def process_job(job_key):
     data = Dict(key=job_key)
+    data.update( { 'status' : 'started' } )
+
     articles = fetch_data_from_wiki(data['nouns'])
     for article in articles:
         print '\n\n Heading %s \n' % (article.heading)
@@ -320,12 +322,18 @@ def process_job(job_key):
 
     final_articles = [ article.get_dict() for article in articles[:3] ]
 
-    data.update({ 'result' : final_articles })
+    data.update({ 'status' : 'finished', 'result' : final_articles })
 
 
 def get_result(job_key):
     data = Dict(key=job_key)
-    result = data['result']
+
+    result = {}
+    if(data['status']=='finished'):
+        result.update({ 'id' : data.key, 'status' : data['status'] , 'pages' : data['result'] })
+    else:
+        result.update({ 'id' : data.key, 'status' : data['status'] })
+
     return result
 
 def scrape_text(url):
