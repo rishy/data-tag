@@ -13,10 +13,6 @@ angular.module('data-tag')
     $scope.input.link = null;
     $scope.processing = false;
 
-    $scope.tab = {};
-    $scope.tab.url = true;
-    $scope.tab.text = false;
-
     $scope.pages = {};
     $scope.showResult = false;
     $scope.showNoun = new Array(18);
@@ -25,7 +21,7 @@ angular.module('data-tag')
 
     $scope.result = {};
 
-  	$scope.postData = function(){
+    $scope.postData = function(){
 
         $scope.processing = true;
         blinkProcessing();
@@ -89,23 +85,8 @@ angular.module('data-tag')
             }
         }, 500);
 
-  	}
-    console.log($scope.tab);
-    //console.log($scope.tab);
-    $scope.navtab = function(value){
-        if (value==="url") {
-            $scope.tab.text = false;
-            $scope.tab.url = true;
-            console.log($scope.tab);
-        }
-        else{
-            $scope.tab.text = true;
-            $scope.tab.url = false;
-            console.log($scope.tab);
-        }
     }
 
-<<<<<<< HEAD
     $scope.navtab = function(value){
         if (value==="url") {
             $scope.tab.text = false;
@@ -160,6 +141,4 @@ angular.module('data-tag')
         return o;
     }
 
-=======
->>>>>>> feat(ui): input url field added along with navigation
 }]);
