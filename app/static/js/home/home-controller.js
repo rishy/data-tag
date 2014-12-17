@@ -5,7 +5,7 @@ angular.module('data-tag')
     $scope.tab = {};
     $scope.tab.url = true;
     $scope.tab.text = false;
-   
+
     // Object for data
     $scope.input = {};
     $scope.input.type = null;
@@ -18,10 +18,10 @@ angular.module('data-tag')
     $scope.showNoun = new Array(18);
     var load_interval;
     var blink_interval;
-    
+
     $scope.result = {};
 
-  	$scope.postData = function(){
+    $scope.postData = function(){
 
         $scope.processing = true;
         blinkProcessing();
@@ -64,7 +64,7 @@ angular.module('data-tag')
                 req = { 'id': $scope.result.id };
                 $http.post(url2, req).success(function(data, status){
                     console.log("Text Sent!");
-                    console.log(data);   
+                    console.log(data);
                     // Remove $interval once tags have been fetched
                     if(data.status == 'finished'){
                         $interval.cancel(interval);
@@ -72,7 +72,7 @@ angular.module('data-tag')
                         $interval.cancel(blink_interval);
                         $scope.result = data;
                         // show the tags section with wikipedia summary
-                        $scope.showResult = true;   
+                        $scope.showResult = true;
                     }
                     //  here result object has three properties
                     //  result.id => job key
@@ -85,7 +85,7 @@ angular.module('data-tag')
             }
         }, 500);
 
-  	}
+    }
 
     $scope.navtab = function(value){
         if (value==="url") {
@@ -115,13 +115,13 @@ angular.module('data-tag')
 
             // Hide all the nouns again
             $timeout(function(){
-                $scope.showNoun = new Array(18);                
-            }, 900);            
+                $scope.showNoun = new Array(18);
+            }, 900);
 
             // Shuffle the nouns
-            $scope.nouns = shuffle($scope.nouns);   
-            
-        }, 1000);       
+            $scope.nouns = shuffle($scope.nouns);
+
+        }, 1000);
 
     }
 
@@ -129,9 +129,9 @@ angular.module('data-tag')
 
         blink_interval = $interval(function(){
             // Blink processing
-            $scope.processing = !$scope.processing; 
+            $scope.processing = !$scope.processing;
         }, 900);
-        
+
     }
 
     //+ Jonas Raoni Soares Silva
