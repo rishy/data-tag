@@ -12,3 +12,6 @@ def runapp():
 def runworker():
     local('flask/bin/python worker.py')
 
+def runtest():
+    local('flask/bin/python test.py')
+
